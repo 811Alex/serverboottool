@@ -155,7 +155,11 @@ function watchdog { # executes a command (args), re-executes it when the process
   	rightpadded $(seq $restartdelay -1 $i|wc -m) "\rStarting up..." # overwrite current line
     echo -e "\n"
     sleep .2
-    $@ # run child process
+    if [ "$1" = "SERVERBOOTTOOL_FLAG_ARGFILE" ]; then
+      $3 $(filetoargs $2) ${@:4} # load argfile & run child process
+    else
+      $@ # run child process
+    fi
     echo -e "\n\nProcess stopped! (exit code: $?)\nRestarting in $restartdelay seconds.\n\nPress any key to abort the restart..."
   	for i in $(seq $restartdelay -1 1); do # when the child process stops, count down and restart
     	if read -rs -n1 -t1 -p "$i "; then # if button pressed
@@ -186,7 +190,7 @@ function log {  # write to log
 
 function start { # 1: system user to run as, 2: system group that can access the tmux socket, 3-*: executable/command
   if [ -z "$runfile" ]; then
-    mksession $1 $2 $spath watchdog $3 $([ -z "$argfile" ] || filetoargs $argfile) ${@:4}
+    mksession $1 $2 $spath watchdog $([ -n "$argfile" ] && echo "SERVERBOOTTOOL_FLAG_ARGFILE $argfile") ${@:3}
   else
     temprunfile=$(echo "$runfile")
     runfile=''
