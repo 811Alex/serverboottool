@@ -149,6 +149,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   sudo -iu $1 tmux -S "$socketdir/$1" new -d -s $1 ${@:3}  # start tmux session as user $1
   chgrp $2 "$socketdir/$1"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
+  echo "Started session: $1"
 }
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
