@@ -5,6 +5,7 @@ sname="$(basename -- $0)"                               # Script name
 spath="$(realpath "$0")"                                # Script path
 sdir="$(dirname "$spath")"                              # Script directory
 socketdir="$sdir/sockets"                               # Directory to store tmux sockets
+sessionname=''                                           # Custom socket name
 log="$sdir/$(echo $sname|rev|cut -d. -f2-|rev).log"     # Log file
 logmaxsize=1000                                         # Max number of lines to keep in the log
 restartdelay=10                                         # For watchdog countdown
@@ -22,6 +23,7 @@ function parseflags { # parse flags and return how many arguments were consumed
       -m|--max-log-size)        logmaxsize=$2;                    shift;;
       -l|--log)                 log="$(realpath "$2")";           shift;;
       -s|--socket-dir)          socketdir="$(realpath "$2")";     shift;;
+      -n|--session-name)        sessionname="$2";                 shift;;
       -w|--restart-delay)       restartdelay=$2;                  shift;;
       -r|--run-file)            runfile="$(realpath "$2")";       shift;;
       -a|--arg-file)            argfile="$(realpath "$2")";       shift;;
@@ -143,17 +145,18 @@ function f {  # format text, 1: format, 2-*: text/parameters
 ## Exposed methods ##
 
 function mksession { # execute a command in a tmux session made by a specified user, 1: system user to run tmux as / name of tmux socket & session, 2: system group that can access the tmux socket, 3-*: command to run in the tmux session
-  if [ -S "$socketdir/$1" ]; then # socket exists
-    if [ -n "$(hassession "$socketdir/$1")" ]; then  # session already running on socket
+  [ -z "$sessionname" ] && sessionname="$1"
+  if [ -S "$socketdir/$sessionname" ]; then # socket exists
+    if [ -n "$(hassession "$socketdir/$sessionname")" ]; then  # session already running on socket
       echo "This socket already has a running session, skipping: $1"
       return 1
     fi
   fi
   chgrp $1 "$socketdir"     # give user $1 temporary permission to create files in $socketdir
-  sudo -iu $1 tmux -S "$socketdir/$1" new -d -s $1 ${@:3}  # start tmux session as user $1
-  chgrp $2 "$socketdir/$1"  # grant group $2 access to tmux session
+  sudo -iu $1 tmux -S "$socketdir/$sessionname" new -d -s $sessionname ${@:3}  # start tmux session as user $1
+  chgrp $2 "$socketdir/$sessionname"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
-  echo "Started session: $1"
+  echo "Started session: $sessionname"
 }
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
@@ -259,6 +262,7 @@ function phelp { # print help message
                 p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"              "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
                 p+="$(f flag  "-l, --log"           "file"              "start, log"              "Log file path."                                                                  "$log")\n\n"
                 p+="$(f flag  "-s, --socket-dir"    "directory"         "start, mksession, open"  "Directory to store tmux sockets in."                                             "$socketdir")\n\n"
+                p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"        "Custom socket name for your session."                                            "Default: same as the system user name for the session")\n\n"
                 p+="$(f flag  "-w, --restart-delay" "seconds"           "start, watchdog"         "Wait this amount of time before restarting a dead process."                      "$restartdelay")\n\n"
                 p+="$(f flag  "-r, --run-file"      "file"              "start"                   "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
                 p+="$(f flag  "-a, --arg-file"      "file"              "start"                   "Read arguments from a file, append right after the given command."               "$argfile")\n\n "
