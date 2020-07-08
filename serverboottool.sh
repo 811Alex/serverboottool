@@ -34,6 +34,10 @@ function parseflags { # parse flags and return how many arguments were consumed
   done
 }
 
+function getflagstr {
+  echo "-m $logmaxsize -l $log -s $socketdir -w $restartdelay$([ -n "$argfile" ] && echo " -a $argfile")$($dashes && echo " -d")"
+}
+
 function prepfiles {  # prepare dirs/files and check perms
   # prepare directories
   for d in $(echo -e "$socketdir"); do
@@ -204,7 +208,7 @@ function start { # 1: system user to run as, 2: system group that can access the
       line="$(echo "$line"|tr "\t" ' '|tr -s ' ')" # squeeze spaces
       command="$(echo "$line"|cut -d' ' -f1)"
       args="$(echo "$line"|cut -d' ' -f2-)"
-      $spath $command -m $logmaxsize -l "$log" -s "$socketdir" -w $restartdelay $args
+      $spath $command $(getflagstr) $args
     done
   fi
 }
