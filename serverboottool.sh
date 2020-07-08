@@ -104,6 +104,10 @@ function filetoargs { # reads file, optionally adds dashes in front of each line
   echo $(rmdoc $1|($dashes && sed 's/^/-&/g' || cat)) # read file skipping comments/empty lines -> (add dashes) -> make it a single line
 }
 
+function hassession {
+  echo "$(tmux -S "$@" ls 2> /dev/null)"
+}
+
 function rightpadded { # print single-line string with space padding, 1: full width, 2: string
   padding=$(printf '%*s' $(($1-$(echo -e "$2"|tr -d "\n\r"|wc -m))))
   echo -en "$2$padding"
@@ -136,7 +140,7 @@ function f {  # format text, 1: format, 2-*: text/parameters
 
 function mksession { # execute a command in a tmux session made by a specified user, 1: system user to run tmux as / name of tmux socket & session, 2: system group that can access the tmux socket, 3-*: command to run in the tmux session
   if [ -S "$socketdir/$1" ]; then # socket exists
-    if [ -n "$(tmux -S "$socketdir/$1" ls 2> /dev/null)" ]; then  # session already running on socket
+    if [ -n "$(hassession "$socketdir/$1")" ]; then  # session already running on socket
       echo "This socket already has a running session, skipping: $1"
       return 1
     fi
@@ -229,7 +233,7 @@ function list {
   flag=false
   for s in $socketdir/*; do # for each item in $socketdir
     if [ -S "$s" ]; then
-      if [ -n "$(tmux -S "$s" ls 2> /dev/null)" ]; then
+      if [ -n "$(hassession "$s")" ]; then
         echo "$(basename -- $s)"
         flag=true
       fi
