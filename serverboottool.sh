@@ -146,7 +146,7 @@ function f {  # format text, 1: format, 2-*: text/parameters
   esac
 }
 
-function installautocomplete{
+function installautocomplete {
   local acscript
   acscript='
     function _serverboottoolacw_open {
