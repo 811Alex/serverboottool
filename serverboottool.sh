@@ -5,7 +5,6 @@ sname="$(basename -- $0)"                                   # Script name
 snamenoext="$(echo "$sname" | rev | cut -d'.' -f2- | rev)"  # Script name without the extension
 spath="$(realpath "$0")"                                    # Script path
 sdir="$(dirname "$spath")"                                  # Script directory
-acspath="/etc/bash_completion.d/$snamenoext"                # Autocomplete script path
 socketdir="$sdir/sockets"                                   # Directory to store tmux sockets
 sessionname=''                                              # Custom socket name
 log="$sdir/$(echo $sname|rev|cut -d. -f2-|rev).log"         # Log file
@@ -173,7 +172,8 @@ function installautocomplete {
     }
 
     complete -F _serverboottoolacw '"$snamenoext"
-  echo "$acscript" > $acspath
+  echo "$acscript" > "/etc/bash_completion.d/$snamenoext"                 # Autocomplete script path
+  echo "$acscript" > "/usr/share/bash-completion/completions/$snamenoext" # Autocomplete script path
 }
 
 ## Exposed methods ##
