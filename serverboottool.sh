@@ -117,11 +117,13 @@ function hassession {
 }
 
 function rightpadded { # print single-line string with space padding, 1: full width, 2: string
+  local padding
   padding=$(printf '%*s' $(($1-$(echo -e "$2"|tr -d "\n\r"|wc -m))))
   echo -en "$2$padding"
 }
 
 function f {  # format text, 1: format, 2-*: text/parameters
+  local normal format colored
   case "$1" in
     command) echo -en "$(f 4 $2) [$(f 1 'flags')] $3\n\t\t $(f 2 $4)";;
     flag) echo -en "\t$2 $(f 1 $3)\n\t\t$([ -z "$4" ] || echo -en "$(f 2 "Available in:") $(f 4 "$4")\n\t\t")$(f 2 "$5$([ -z "$6" ] || echo "\n\t\tDefault: $6")")";;
@@ -145,8 +147,10 @@ function f {  # format text, 1: format, 2-*: text/parameters
 }
 
 function installautocomplete{
+  local acscript
   acscript='
     function _serverboottoolacw_open {
+      local w
       w=$($snamenoext list)
       [ $? -eq 0 ] && echo $w
     }
@@ -186,6 +190,7 @@ function mksession { # execute a command in a tmux session made by a specified u
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
   trap '' SIGINT # ignore ctrl+c (does not affect children)
+  local i key
   i=$restartdelay
 
   while true; do
@@ -216,12 +221,14 @@ function watchdog { # executes a command (args), re-executes it when the process
 }
 
 function log {  # write to log
+  local temp
   echo "$@" >> "$log"
   temp=$(tail -n $logmaxsize "$log")
   echo "$temp" > "$log" # trim log
 }
 
 function start { # 1: system user to run as, 2: system group that can access the tmux socket, 3-*: executable/command
+  local temprunfile line command args
   if [ -z "$runfile" ]; then
     mksession $1 $2 $spath watchdog $(getflagstr) ${@:3}
   else
@@ -238,6 +245,7 @@ function start { # 1: system user to run as, 2: system group that can access the
 }
 
 function addcron {
+  local before
   if [ -n "$1" ]; then
     before=$(crontab -l)
     (crontab -l|grep -v -F "$sname"; echo "### Added by $sname ###"; echo "@reboot '$spath' start -r '$(realpath "$1")'") | crontab - && \
@@ -250,6 +258,7 @@ function addcron {
 }
 
 function install {
+  local compath
   echo "Installing autocompletion script..."
   installautocomplete
   echo "Adding command..."
@@ -271,6 +280,7 @@ function open {
 }
 
 function list {
+  local flag
   flag=false
   for s in $socketdir/*; do # for each item in $socketdir
     if [ -S "$s" ]; then
@@ -284,6 +294,7 @@ function list {
 }
 
 function phelp { # print help message
+  local p
   case "$1" in
     log)        p=$(f command $1  "$(f 1 'text')"                                             "Write something in the log file. This is mostly useful in a \"run-file\", ran with the start command. Supports these variables: $logvars");; # TODO: add that it's useful with run-files
     mksession)  p=$(f command $1  "$(f 1 'system-user system-group shell-command')"           "Execute a command in a tmux session made by a specified user. The tmux socket can be accessed by any user that belongs to the specified group.");;
