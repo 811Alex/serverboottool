@@ -273,8 +273,7 @@ function install {
   compath="/usr/bin/$snamenoext"
   ln -fs "$spath" "$compath"
   which "$snamenoext" > /dev/null &&
-  echo "Command added successfully!" &&
-  echo "$snamenoext: $compath -> $spath" ||
+  echo -e "Command added successfully!\n$snamenoext: $compath -> $spath" ||
   echo "Failed to add command."
 }
 
