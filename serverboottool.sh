@@ -150,7 +150,7 @@ function installautocomplete {
   acscript='
     function _serverboottoolacw_open {
       local w
-      w=$($snamenoext list)
+      w=$('"$snamenoext"' list)
       [ $? -eq 0 ] && echo $w
     }
 
