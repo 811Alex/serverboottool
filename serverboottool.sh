@@ -264,7 +264,7 @@ function install {
   echo "Adding command..."
   compath="/usr/bin/$snamenoext"
   ln -fs "$spath" "$compath"
-  which "$snamenoext" &&
+  which "$snamenoext" > /dev/null &&
   echo "Command added successfully!" &&
   echo "$snamenoext: $compath -> $spath" ||
   echo "Failed to add command."
