@@ -224,7 +224,7 @@ function addcron {
   fi
 }
 
-function addcommand {
+function install {
   comname="$(echo "$sname" | rev | cut -d'.' -f2- | rev)"
   compath="/usr/bin/$comname"
   ln -fs "$spath" "$compath"
@@ -263,11 +263,11 @@ function phelp { # print help message
     watchdog)   p=$(f command $1  "$(f 1 'shell-command')"                                    "Execute a command and re-execute it if the process exits, after a countdown");;
     start)      p=$(f command $1  "(-r $(f 1 'file|system-user system-group shell-command'))" "Execute a command in a tmux session made by a specified user, which is accessible by users in the specified group and re-execute the command if the process exits. This essentially combines the commands mksession & watchdog.");;
     addcron)    p=$(f command $1  "$(f 1 'run-file')"                                         "Makes the script run automatically on startup. The script will run with the options \"start --run-file\", so you'll need to provide a run-file. If you already manually added cron jobs for this script, don't use this command.");;
-    addcommand) p=$(f command $1  "$(f 1)"                                                    "Adds the script as a system command. This will make a symlink, so make sure the script is located where you want it to be, before running this.");;
+    install) p=$(f command $1  "$(f 1)"                                                    "Adds the script as a system command. This will make a symlink, so make sure the script is located where you want it to be, before running this.");;
     open)       p=$(f command $1  "$(f 1 'session-name')"                                     "Connect to a shared tmux session. Essentially an alias for \"tmux attach\", with a different default socket directory.");;
     list)       p=$(f command $1  ""                                                          "List running sessions. Please note that This will only list sessions you have access to.");;
     commands)   p="$(f 3 'Script commands:')\n"
-                for a in log mksession watchdog start addcron addcommand open list; do p+="\t$(phelp $a)\n\n"; done;;
+                for a in log mksession watchdog start addcron install open list; do p+="\t$(phelp $a)\n\n"; done;;
     flags)      p="$(f 3 'Flags:')\n"
                 p+="$(f flag  "-h, --help, help"    "[script-command]"  ""                        "Display this help message, or get info on the provided script command and exit." "")\n\n"
                 p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"              "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
@@ -303,14 +303,14 @@ if [ $(id -u) == 0 ]; then # if ran as root
   prepfiles
 else
   case "$cmd" in
-    log|mksession|start|addcron|addcommand)  # only root can run these commands
+    log|mksession|start|addcron|install)  # only root can run these commands
       echo "Only root is allowed to run this command."
       exit 3;;
   esac
 fi
 
 case "$cmd" in  # exec command
-  log|mksession|watchdog|start|addcron|addcommand|open|list) $cmd $@;;
+  log|mksession|watchdog|start|addcron|install|open|list) $cmd $@;;
   help|--help|-h|'')            phelp $@; exit 0;;
   *) echo "Unrecognized command, type: $sname --help"
   exit 1
