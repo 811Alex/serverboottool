@@ -10,8 +10,10 @@ With this script:
 - If you want to make your apps start automatically with your server, you can do it with minimal knowledge
 - You can use a single file to tell the script all the apps it has to run, so you don't have a bunch of scripts all over the place
 - If an app requires a ton of arguments to run, you can keep things tidy, by having all your arguments for an app in a file, in separate lines and with comments, that you can feed to this script when you run the app with it (a good example is running a java app that you want to really tune the JVM for)
-- By design, each app gets executed as a separate regular system user, to maximize security
+- If you use an argument file, it will be reloaded, if your app gets restarted by the watchdog
+- By default, each app gets executed as a separate regular system user, to maximize security (each session gets named after the user, but you can use custom names to run multiple sessions as the same user)
 - You only need to download the script itself, it will create files/directories as needed
+- You get sub-command & session name autocomplete (for the sessions your user has access to)
 
 ## How to use
 The script has a help command you can take a look at for more info, but here's an example that shows how you'd set it up to run two Minecraft servers and a Node.js app on startup and how to share the sessions with other system users. Don't blindly copy things from the example, since some things are there just for demonstration purposes.
