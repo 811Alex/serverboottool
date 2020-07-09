@@ -315,4 +315,4 @@ case "$cmd" in  # exec command
   *) echo "Unrecognized command, type: $sname --help"
   exit 1
 esac
-exit 0
+exit $?
