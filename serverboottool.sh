@@ -1,19 +1,20 @@
 #!/bin/bash
 
 ## Default settings ##
-sname="$(basename -- $0)"                               # Script name
-spath="$(realpath "$0")"                                # Script path
-sdir="$(dirname "$spath")"                              # Script directory
-socketdir="$sdir/sockets"                               # Directory to store tmux sockets
-sessionname=''                                           # Custom socket name
-log="$sdir/$(echo $sname|rev|cut -d. -f2-|rev).log"     # Log file
-logmaxsize=1000                                         # Max number of lines to keep in the log
-restartdelay=10                                         # For watchdog countdown
-runfile=''                                              # File to run using this script
-argfile=''                                              # File to pull args from
-dashes=false                                            # Use with --arg-file to add dashes in front of every argument pulled from the argfile
-logvars='$time'                                         # This is for the help page, don't forget to update it if you change the exposed variables in readrunfile()
-argnum="$#"                                             # Number of arguments to parse, don't touch this if you don't know what you're doing
+sname="$(basename -- $0)"                                   # Script name
+snamenoext="$(echo "$sname" | rev | cut -d'.' -f2- | rev)"  # Script name without the extension
+spath="$(realpath "$0")"                                    # Script path
+sdir="$(dirname "$spath")"                                  # Script directory
+socketdir="$sdir/sockets"                                   # Directory to store tmux sockets
+sessionname=''                                              # Custom socket name
+log="$sdir/$(echo $sname|rev|cut -d. -f2-|rev).log"         # Log file
+logmaxsize=1000                                             # Max number of lines to keep in the log
+restartdelay=10                                             # For watchdog countdown
+runfile=''                                                  # File to run using this script
+argfile=''                                                  # File to pull args from
+dashes=false                                                # Use with --arg-file to add dashes in front of every argument pulled from the argfile
+logvars='$time'                                             # This is for the help page, don't forget to update it if you change the exposed variables in readrunfile()
+argnum="$#"                                                 # Number of arguments to parse, don't touch this if you don't know what you're doing
 
 ## Methods ##
 
@@ -225,12 +226,11 @@ function addcron {
 }
 
 function install {
-  comname="$(echo "$sname" | rev | cut -d'.' -f2- | rev)"
-  compath="/usr/bin/$comname"
+  compath="/usr/bin/$snamenoext"
   ln -fs "$spath" "$compath"
-  which "$comname" &&
+  which "$snamenoext" &&
   echo "Command added successfully!" &&
-  echo "$comname: $compath -> $spath" ||
+  echo "$snamenoext: $compath -> $spath" ||
   echo "Failed to add command."
 }
 
