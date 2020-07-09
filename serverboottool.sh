@@ -267,13 +267,13 @@ function addcron {
 
 function install {
   local compath
-  echo "Installing autocompletion script..."
-  installautocomplete
   echo "Adding command..."
   compath="/usr/bin/$snamenoext"
   ln -fs "$spath" "$compath"
-  which "$snamenoext" > /dev/null &&
-  echo -e "Command added successfully!\n$snamenoext: $compath -> $spath" ||
+  which "$snamenoext" > /dev/null && (
+  echo -e "Command added successfully!\n$snamenoext: $compath -> $spath\nInstalling autocompletion script..."
+  installautocomplete
+  ) ||
   echo "Failed to add command."
 }
 
