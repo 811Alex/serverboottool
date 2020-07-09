@@ -5,6 +5,7 @@ sname="$(basename -- $0)"                                   # Script name
 snamenoext="$(echo "$sname" | rev | cut -d'.' -f2- | rev)"  # Script name without the extension
 spath="$(realpath "$0")"                                    # Script path
 sdir="$(dirname "$spath")"                                  # Script directory
+acspath="/etc/bash_completion.d/$snamenoext"                # Autocomplete script path
 socketdir="$sdir/sockets"                                   # Directory to store tmux sockets
 sessionname=''                                              # Custom socket name
 log="$sdir/$(echo $sname|rev|cut -d. -f2-|rev).log"         # Log file
@@ -143,6 +144,29 @@ function f {  # format text, 1: format, 2-*: text/parameters
   esac
 }
 
+function installautocomplete{
+  acscript='
+    function _serverboottoolacw_open {
+      w=$($snamenoext list)
+      [ $? -eq 0 ] && echo $w
+    }
+
+    function _serverboottoolacw {
+      local cur prev opts
+      COMPREPLY=()
+      cur="${COMP_WORDS[COMP_CWORD]}"
+      prev="${COMP_WORDS[COMP_CWORD-1]}"
+      case "$prev" in
+        open) opts=$(_serverboottoolacw_open);;
+        *) opts=''
+      esac
+      COMPREPLY=( $(compgen -W "$opts" -- $cur) )
+    }
+
+    complete -F _serverboottoolacw '"$snamenoext"
+  echo "$acscript" > $acspath
+}
+
 ## Exposed methods ##
 
 function mksession { # execute a command in a tmux session made by a specified user, 1: system user to run tmux as / name of tmux socket & session, 2: system group that can access the tmux socket, 3-*: command to run in the tmux session
@@ -226,6 +250,9 @@ function addcron {
 }
 
 function install {
+  echo "Installing autocompletion script..."
+  installautocomplete
+  echo "Adding command..."
   compath="/usr/bin/$snamenoext"
   ln -fs "$spath" "$compath"
   which "$snamenoext" &&
