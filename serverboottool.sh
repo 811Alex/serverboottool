@@ -253,7 +253,7 @@ function list {
       fi
     fi
   done
-  $flag || (echo "No running sessions found."; return 1)
+  $flag || (echo "No running sessions found."; return 6)
 }
 
 function phelp { # print help message
