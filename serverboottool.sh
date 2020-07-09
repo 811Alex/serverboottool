@@ -155,13 +155,18 @@ function installautocomplete {
       [ $? -eq 0 ] && echo $w
     }
 
+    function _serverboottoolacw_com {
+      echo "log mksession watchdog start addcron install open list help"
+    }
+
     function _serverboottoolacw {
       local cur prev opts
       COMPREPLY=()
       cur="${COMP_WORDS[COMP_CWORD]}"
       prev="${COMP_WORDS[COMP_CWORD-1]}"
       case "$prev" in
-        open) opts=$(_serverboottoolacw_open);;
+        open)             opts=$(_serverboottoolacw_open);;
+        '"$snamenoext"')  opts=$(_serverboottoolacw_com);;
         *) opts=''
       esac
       COMPREPLY=( $(compgen -W "$opts" -- $cur) )
