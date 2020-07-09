@@ -174,6 +174,9 @@ function installautocomplete {
     complete -F _serverboottoolacw '"$snamenoext"
   echo "$acscript" > "/etc/bash_completion.d/$snamenoext"                 # Autocomplete script path
   echo "$acscript" > "/usr/share/bash-completion/completions/$snamenoext" # Autocomplete script path
+  apt install bash-completion &&
+  echo "Autocompletion script installed! Please restart your session to load it." ||
+  (echo "Couldn't install bash-completion, autocomplete will be unavailable."; return 7)
 }
 
 ## Exposed methods ##
