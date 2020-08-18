@@ -190,7 +190,7 @@ function mksession { # execute a command in a tmux session made by a specified u
     fi
   fi
   chgrp $1 "$socketdir"     # give user $1 temporary permission to create files in $socketdir
-  sudo -iu $1 tmux -S "$socketdir/$sessionname" new -d -s $sessionname ${@:3}  # start tmux session as user $1
+  sudo -iu $1 tmux -S "$socketdir/$sessionname" -n $sessionname new -d -s $sessionname ${@:3}  # start tmux session as user $1
   chgrp $2 "$socketdir/$sessionname"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
   echo "Started session: $sessionname"
