@@ -279,7 +279,7 @@ function install {
 
 function open {
   if [ -e "$socketdir/$1" ]; then
-    if [ -n "$(hassession "$socketdir/$sessionname")" ]; then  # session already running on socket
+    if [ -n "$(hassession "$socketdir/$1")" ]; then  # session already running on socket
       tmux -S "$socketdir/$1" attach
     else
       echo "This socket does not have a running session: $1"
