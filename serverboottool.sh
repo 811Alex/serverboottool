@@ -318,7 +318,7 @@ function phelp { # print help message
                 p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"              "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
                 p+="$(f flag  "-l, --log"           "file"              "start, log"              "Log file path."                                                                  "$log")\n\n"
                 p+="$(f flag  "-s, --socket-dir"    "directory"         "start, mksession, open"  "Directory to store tmux sockets in."                                             "$socketdir")\n\n"
-                p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"        "Custom socket name for your session."                                            "Default: same as the system user name for the session")\n\n"
+                p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"        "Custom socket name for your session."                                            "same as the system user name for the session")\n\n"
                 p+="$(f flag  "-w, --restart-delay" "seconds"           "start, watchdog"         "Wait this amount of time before restarting a dead process."                      "$restartdelay")\n\n"
                 p+="$(f flag  "-r, --run-file"      "file"              "start"                   "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
                 p+="$(f flag  "-a, --arg-file"      "file"              "start"                   "Read arguments from a file, append right after the given command."               "$argfile")\n\n "
