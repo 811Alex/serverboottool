@@ -148,14 +148,14 @@ function f {  # format text, 1: format, 2-*: text/parameters
 function installautocomplete {
   local acscript
   acscript='
-    function _serverboottoolacw_open {
+    function _serverboottoolacw_list {
       local w
       w=$('"$snamenoext"' list)
       [ $? -eq 0 ] && echo $w
     }
 
     function _serverboottoolacw_com {
-      echo "log mksession watchdog start addcron install open list help"
+      echo "log mksession watchdog start addcron install open kill list help"
     }
 
     function _serverboottoolacw {
@@ -164,7 +164,8 @@ function installautocomplete {
       cur="${COMP_WORDS[COMP_CWORD]}"
       prev="${COMP_WORDS[COMP_CWORD-1]}"
       case "$prev" in
-        open)             opts=$(_serverboottoolacw_open);;
+        open)
+        kill)             opts=$(_serverboottoolacw_list);;
         '"$snamenoext"')  opts=$(_serverboottoolacw_com);;
         *) opts=''
       esac
@@ -286,6 +287,15 @@ function open {
   fi
 }
 
+function kill {
+  if [ -e "$socketdir/$1" ]; then
+    tmux -S "$socketdir/$1" kill-session
+  else
+    echo "Socket not found: $1"
+    exit 4
+  fi
+}
+
 function list {
   local flag
   flag=false
@@ -310,14 +320,15 @@ function phelp { # print help message
     addcron)    p=$(f command $1  "$(f 1 'run-file')"                                         "Makes the script run automatically on startup. The script will run with the options \"start --run-file\", so you'll need to provide a run-file. If you already manually added cron jobs for this script, don't use this command.");;
     install) p=$(f command $1  "$(f 1)"                                                       "Adds the script as a system command and adds autocompletion. This will make a symlink, so make sure the script is located where you want it to be, before running this.");;
     open)       p=$(f command $1  "$(f 1 'session-name')"                                     "Connect to a shared tmux session. Essentially an alias for \"tmux attach\", with a different default socket directory.");;
+    kill)       p=$(f command $1  "$(f 1 'session-name')"                                     "Kill a shared tmux session. Essentially an alias for \"tmux kill-session\", with a different default socket directory.");;
     list)       p=$(f command $1  ""                                                          "List running sessions. Please note that This will only list sessions you have access to.");;
     commands)   p="$(f 3 'Script commands:')\n"
-                for a in log mksession watchdog start addcron install open list; do p+="\t$(phelp $a)\n\n"; done;;
+                for a in log mksession watchdog start addcron install open kill list; do p+="\t$(phelp $a)\n\n"; done;;
     flags)      p="$(f 3 'Flags:')\n"
                 p+="$(f flag  "-h, --help, help"    "[script-command]"  ""                        "Display this help message, or get info on the provided script command and exit." "")\n\n"
                 p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"              "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
                 p+="$(f flag  "-l, --log"           "file"              "start, log"              "Log file path."                                                                  "$log")\n\n"
-                p+="$(f flag  "-s, --socket-dir"    "directory"         "start, mksession, open"  "Directory to store tmux sockets in."                                             "$socketdir")\n\n"
+                p+="$(f flag  "-s, --socket-dir"    "directory"         "start, mksession, open, kill"  "Directory to store tmux sockets in."                                             "$socketdir")\n\n"
                 p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"        "Custom socket name for your session."                                            "same as the system user name for the session")\n\n"
                 p+="$(f flag  "-w, --restart-delay" "seconds"           "start, watchdog"         "Wait this amount of time before restarting a dead process."                      "$restartdelay")\n\n"
                 p+="$(f flag  "-r, --run-file"      "file"              "start"                   "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
@@ -355,7 +366,7 @@ else
 fi
 
 case "$cmd" in  # exec command
-  log|mksession|watchdog|start|addcron|install|open|list) $cmd $@;;
+  log|mksession|watchdog|start|addcron|install|open|kill|list) $cmd $@;;
   help|--help|-h|'')            phelp $@; exit 0;;
   *) echo "Unrecognized command, type: $sname --help"
   exit 1
