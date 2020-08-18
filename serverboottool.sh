@@ -293,7 +293,8 @@ function open {
 
 function kill {
   if [ -e "$socketdir/$1" ]; then
-    tmux -S "$socketdir/$1" kill-session
+    tmux -S "$socketdir/$1" kill-session &&
+    echo "Sent kill signal: $1"
   else
     echo "Socket not found: $1"
     exit 6
