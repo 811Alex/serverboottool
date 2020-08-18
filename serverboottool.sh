@@ -164,8 +164,7 @@ function installautocomplete {
       cur="${COMP_WORDS[COMP_CWORD]}"
       prev="${COMP_WORDS[COMP_CWORD-1]}"
       case "$prev" in
-        open)
-        kill)             opts=$(_serverboottoolacw_list);;
+        open|kill)             opts=$(_serverboottoolacw_list);;
         '"$snamenoext"')  opts=$(_serverboottoolacw_com);;
         *) opts=''
       esac
@@ -325,15 +324,15 @@ function phelp { # print help message
     commands)   p="$(f 3 'Script commands:')\n"
                 for a in log mksession watchdog start addcron install open kill list; do p+="\t$(phelp $a)\n\n"; done;;
     flags)      p="$(f 3 'Flags:')\n"
-                p+="$(f flag  "-h, --help, help"    "[script-command]"  ""                        "Display this help message, or get info on the provided script command and exit." "")\n\n"
-                p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"              "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
-                p+="$(f flag  "-l, --log"           "file"              "start, log"              "Log file path."                                                                  "$log")\n\n"
+                p+="$(f flag  "-h, --help, help"    "[script-command]"  ""                              "Display this help message, or get info on the provided script command and exit." "")\n\n"
+                p+="$(f flag  "-m, --max-log-size"  "size"              "start, log"                    "Max log size, if exceded, older records will be deleted to maintain."            "$logmaxsize")\n\n"
+                p+="$(f flag  "-l, --log"           "file"              "start, log"                    "Log file path."                                                                  "$log")\n\n"
                 p+="$(f flag  "-s, --socket-dir"    "directory"         "start, mksession, open, kill"  "Directory to store tmux sockets in."                                             "$socketdir")\n\n"
-                p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"        "Custom socket name for your session."                                            "same as the system user name for the session")\n\n"
-                p+="$(f flag  "-w, --restart-delay" "seconds"           "start, watchdog"         "Wait this amount of time before restarting a dead process."                      "$restartdelay")\n\n"
-                p+="$(f flag  "-r, --run-file"      "file"              "start"                   "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
-                p+="$(f flag  "-a, --arg-file"      "file"              "start"                   "Read arguments from a file, append right after the given command."               "$argfile")\n\n "
-                p+="$(f flag  "-d, --dashes"        ""                  "start"                   "To be used with the -a flag. Add dashes in front of every argument."             "$dashes")\n\n"
+                p+="$(f flag  "-n, --session-name"  "name"              "start, mksession"              "Custom socket name for your session."                                            "same as the system user name for the session")\n\n"
+                p+="$(f flag  "-w, --restart-delay" "seconds"           "start, watchdog"               "Wait this amount of time before restarting a dead process."                      "$restartdelay")\n\n"
+                p+="$(f flag  "-r, --run-file"      "file"              "start"                         "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
+                p+="$(f flag  "-a, --arg-file"      "file"              "start"                         "Read arguments from a file, append right after the given command."               "$argfile")\n\n "
+                p+="$(f flag  "-d, --dashes"        ""                  "start"                         "To be used with the -a flag. Add dashes in front of every argument."             "$dashes")\n\n"
                 ;;
     notes)      p="$(f 3 'Notes:')\n"
                 p+="$(f note  "Run this script as root. This is to be able to start sessions as other users.")\n"
