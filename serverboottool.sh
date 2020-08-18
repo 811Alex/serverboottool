@@ -296,7 +296,7 @@ function kill {
     tmux -S "$socketdir/$1" kill-session
   else
     echo "Socket not found: $1"
-    exit 4
+    exit 6
   fi
 }
 
