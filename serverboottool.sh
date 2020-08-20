@@ -13,6 +13,7 @@ restartdelay=10                                             # For watchdog count
 runfile=''                                                  # File to run using this script
 argfile=''                                                  # File to pull args from
 dashes=false                                                # Use with --arg-file to add dashes in front of every argument pulled from the argfile
+isinrunfile=false                                           # Flag for internal use, to know when the script was executed from a run-file
 logvars='$time'                                             # This is for the help page, don't forget to update it if you change the exposed variables in readrunfile()
 argnum="$#"                                                 # Number of arguments to parse, don't touch this if you don't know what you're doing
 
@@ -29,6 +30,7 @@ function parseflags { # parse flags and return how many arguments were consumed
       -r|--run-file)            runfile="$(realpath "$2")";       shift;;
       -a|--arg-file)            argfile="$(realpath "$2")";       shift;;
       -d|--dashes)              dashes=true;;
+      ---runfile---)            isinrunfile=true;;
       *)
         ((argnum=$argnum-$#))
         return
@@ -247,7 +249,7 @@ function start { # 1: system user to run as, 2: system group that can access the
       line="$(echo "$line"|tr "\t" ' '|tr -s ' ')" # squeeze spaces
       command="$(echo "$line"|cut -d' ' -f1)"
       args="$(echo "$line"|cut -d' ' -f2-)"
-      $spath $command $(getflagstr) $args
+      $spath $command ---runfile--- $(getflagstr) $args
     done
   fi
 }
