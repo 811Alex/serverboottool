@@ -191,7 +191,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   if [ -S "$socketdir/$sessionname" ]; then # socket exists
     if [ -n "$(hassession "$socketdir/$sessionname")" ]; then  # session already running on socket
       echo "This socket already has a running session, skipping: $1"
-      $isinrunfile || $open && open "$sessionname"
+      $isinrunfile || ($open && open "$sessionname")
       return 1
     fi
   fi
@@ -200,7 +200,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   chgrp $2 "$socketdir/$sessionname"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
   echo "Started session: $sessionname"
-  $isinrunfile || $open && open "$sessionname"
+  $isinrunfile || ($open && open "$sessionname")
 }
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
