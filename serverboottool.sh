@@ -16,6 +16,7 @@ dashes=false                                                # Use with --arg-fil
 open=false                                                  # Use this to open the session after creating it
 isinrunfile=false                                           # Flag for internal use, to know when the script was executed from a run-file
 logvars='$time'                                             # This is for the help page, don't forget to update it if you change the exposed variables in readrunfile()
+timeformat='%F %T'                                          # Timestamp format
 argnum="$#"                                                 # Number of arguments to parse, don't touch this if you don't know what you're doing
 
 ## Methods ##
@@ -212,7 +213,7 @@ function watchdog { # executes a command (args), re-executes it when the process
     echo -e "\n"
     sleep .2
     $1 $([ -n "$argfile" ] && echo $(filetoargs "$argfile")) ${@:2} # load argfile & run child process
-    echo -e "\n\nProcess stopped! (exit code: $?)\nRestarting in $restartdelay seconds.\n\nPress any key to abort the restart..."
+    echo -e "\n\nProcess stopped! ($(date +"$timeformat") | exit code: $?)\nRestarting in $restartdelay seconds.\n\nPress any key to abort the restart..."
   	for i in $(seq $restartdelay -1 1); do # when the child process stops, count down and restart
     	if read -rs -n1 -t1 -p "$i "; then # if button pressed
         rightpadded $(seq $restartdelay -1 $i|wc -m) "\rExecution halted!" # overwrite current line
