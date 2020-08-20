@@ -13,6 +13,7 @@ restartdelay=10                                             # For watchdog count
 runfile=''                                                  # File to run using this script
 argfile=''                                                  # File to pull args from
 dashes=false                                                # Use with --arg-file to add dashes in front of every argument pulled from the argfile
+open=false                                                  # Use this to open the session after creating it
 isinrunfile=false                                           # Flag for internal use, to know when the script was executed from a run-file
 logvars='$time'                                             # This is for the help page, don't forget to update it if you change the exposed variables in readrunfile()
 argnum="$#"                                                 # Number of arguments to parse, don't touch this if you don't know what you're doing
@@ -30,6 +31,7 @@ function parseflags { # parse flags and return how many arguments were consumed
       -r|--run-file)            runfile="$(realpath "$2")";       shift;;
       -a|--arg-file)            argfile="$(realpath "$2")";       shift;;
       -d|--dashes)              dashes=true;;
+      -o|--open)                open=true;;
       ---runfile---)            isinrunfile=true;;
       *)
         ((argnum=$argnum-$#))
@@ -196,6 +198,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   chgrp $2 "$socketdir/$sessionname"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
   echo "Started session: $sessionname"
+  $isinrunfile || $open && open "$sessionname"
 }
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
@@ -341,6 +344,7 @@ function phelp { # print help message
                 p+="$(f flag  "-r, --run-file"      "file"              "start"                         "Run the script commands in a file. Check the \"Notes\" section for more information."                                              "$runfile")\n\n"
                 p+="$(f flag  "-a, --arg-file"      "file"              "start"                         "Read arguments from a file, append right after the given command."               "$argfile")\n\n "
                 p+="$(f flag  "-d, --dashes"        ""                  "start"                         "To be used with the -a flag. Add dashes in front of every argument."             "$dashes")\n\n"
+                p+="$(f flag  "-o, --open"          ""                  "start, mksession"              "Open the session right after creating it. Incompatible with -r & run-files!"     "$open")\n\n"
                 ;;
     notes)      p="$(f 3 'Notes:')\n"
                 p+="$(f note  "Run this script as root. This is to be able to start sessions as other users.")\n"
