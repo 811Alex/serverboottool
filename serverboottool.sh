@@ -42,7 +42,7 @@ function parseflags { # parse flags and return how many arguments were consumed
 }
 
 function getflagstr {
-  echo "-m $logmaxsize -l $log -s $socketdir -w $restartdelay$([ -n "$argfile" ] && echo " -a $argfile")$($dashes && echo " -d")"
+  echo "-m $logmaxsize -l $log -s $socketdir -w $restartdelay$([ -n "$sessionname" ] && echo " -n $sessionname")$([ -n "$argfile" ] && echo " -a $argfile")$($dashes && echo " -d")"
 }
 
 function prepfiles {  # prepare dirs/files and check perms
