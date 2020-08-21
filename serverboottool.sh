@@ -80,7 +80,7 @@ function prepfiles {  # prepare dirs/files and check perms
   # cleanup unused sockets
   for s in $socketdir/*; do # for each item in $socketdir
     [ -S "$s" ] &&
-      [ -z "$(hassession "$socketdir/$sessionname")" ] &&
+      [ -z "$(hassession "$s")" ] &&
         rm "$s"
   done
   # prepare log
