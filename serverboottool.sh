@@ -189,11 +189,10 @@ function installautocomplete {
   (echo "Couldn't install bash-completion, autocomplete will be unavailable."; return 7)
 }
 
-function openflag{  # open session if the flag was provided & we're not in a run-file
-  $isinrunfile || (
+function openflag {  # open session if the flag was provided & we're not in a run-file
+  ! $isinrunfile &&
     $open &&
       open "$1"
-  )
 }
 
 ## Exposed methods ##
