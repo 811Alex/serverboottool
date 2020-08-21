@@ -186,6 +186,13 @@ function installautocomplete {
   (echo "Couldn't install bash-completion, autocomplete will be unavailable."; return 7)
 }
 
+function openflag{  # open session if the flag was provided & we're not in a run-file
+  $isinrunfile || (
+    $open &&
+      open "$1"
+  )
+}
+
 ## Exposed methods ##
 
 function mksession { # execute a command in a tmux session made by a specified user, 1: system user to run tmux as / name of tmux socket & session, 2: system group that can access the tmux socket, 3-*: command to run in the tmux session
@@ -193,7 +200,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   if [ -S "$socketdir/$sessionname" ]; then # socket exists
     if [ -n "$(hassession "$socketdir/$sessionname")" ]; then  # session already running on socket
       echo "This socket already has a running session, skipping: $1"
-      $isinrunfile || ($open && open "$sessionname")
+      openflag "$sessionname"
       return 1
     fi
   fi
@@ -202,7 +209,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   chgrp $2 "$socketdir/$sessionname"  # grant group $2 access to tmux session
   chgrp 0 "$socketdir"      # revoke temp perms
   echo "Started session: $sessionname"
-  $isinrunfile || ($open && open "$sessionname")
+  openflag "$sessionname"
 }
 
 function watchdog { # executes a command (args), re-executes it when the process exits, after a countdown
