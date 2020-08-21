@@ -46,6 +46,14 @@ function getflagstr {
   echo "-m $logmaxsize -l $log -s $socketdir -w $restartdelay$([ -n "$sessionname" ] && echo " -n $sessionname")$([ -n "$argfile" ] && echo " -a $argfile")$($dashes && echo " -d")"
 }
 
+function cleanup {  # cleanup unused sockets
+  for s in $socketdir/*; do # for each item in $socketdir
+    [ -S "$s" ] &&
+      [ -z "$(hassession "$s")" ] &&
+        rm "$s"
+  done
+}
+
 function prepfiles {  # prepare dirs/files and check perms
   # prepare directories
   for d in $(echo -e "$socketdir"); do
@@ -77,12 +85,7 @@ function prepfiles {  # prepare dirs/files and check perms
       fi
     fi
   done
-  # cleanup unused sockets
-  for s in $socketdir/*; do # for each item in $socketdir
-    [ -S "$s" ] &&
-      [ -z "$(hassession "$s")" ] &&
-        rm "$s"
-  done
+  cleanup
   # prepare log
   touch $log &> /dev/null
   if ! [ -f "$log" ]; then
