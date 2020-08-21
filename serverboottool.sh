@@ -201,7 +201,7 @@ function mksession { # execute a command in a tmux session made by a specified u
   [ -z "$sessionname" ] && sessionname="$1"
   if [ -S "$socketdir/$sessionname" ]; then # socket exists
     if [ -n "$(hassession "$socketdir/$sessionname")" ]; then  # session already running on socket
-      echo "This socket already has a running session, skipping: $1"
+      echo "This socket already has a running session, skipping: $sessionname"
       openflag "$sessionname"
       return 1
     fi
