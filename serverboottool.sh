@@ -77,9 +77,11 @@ function prepfiles {  # prepare dirs/files and check perms
       fi
     fi
   done
-  # cleanup broken sockets
+  # cleanup unused sockets
   for s in $socketdir/*; do # for each item in $socketdir
-    [ -S "$s" ] && [ $(stat -c '%U' "$s") != $(basename -- "$s") ] && rm "$s" # if it's a socket, and the socket's owner is not the same as its name, remove it
+    [ -S "$s" ] &&
+      [ -z "$(hassession "$socketdir/$sessionname")" ] &&
+        rm "$s"
   done
   # prepare log
   touch $log &> /dev/null
